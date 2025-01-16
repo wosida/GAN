@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torchvision
 device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class Generator(nn.Module):
     def __init__(self,noise_len,h,w):
@@ -38,7 +39,8 @@ discriminator=Discriminator(28,28).to(device)
 generator=Generator(noise_len,28,28).to(device)
 d_optimizer=torch.optim.Adam(discriminator.parameters(),lr=0.0002)
 g_optimizer=torch.optim.Adam(generator.parameters(),lr=0.0002,betas=(0.5,0.999)) #beta1 = 0.5：控制一阶矩（梯度的平均值）的衰减率。这个值较小有助于在训练开始时有更多的随机性，通常用于生成对抗网络（GAN）训练。beta2 = 0.999：控制二阶矩（梯度的平方的平均值）的衰减率。这个值较大，有助于稳定梯度。
-
+train_dataset=torchvision.datasets.MNIST(root='./MNIST',train=True,transform=torchvision.transforms.ToTensor(),download=True)
+train_loader=torch.utils.data.DataLoader(train_dataset,batch_size=64,shuffle=True)
 for epoch in range(100):
     for i,(img,_) in enumerate(train_loader):
         real_img=img.to(device)
